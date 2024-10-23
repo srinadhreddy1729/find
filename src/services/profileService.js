@@ -1,11 +1,12 @@
 const profileModel = require('../models/User')
-const crypto=require('crypto')
+const deviceDetails = require('../models/DeviceDetails')
+const crypto = require('crypto')
+
 const generateUserId = () => {
     return new Promise((reslove, reject) => {
-        crypto.randomInt(100000, 1000000, (error,response) => {
+        crypto.randomInt(100000, 1000000, (error, response) => {
             if (error) reject(error);
             else reslove(response)
-
         })
 
     });
@@ -14,8 +15,7 @@ const generateUserId = () => {
 const saveProfileDetails = async (request, response) => {
 
     try {
-        const userId=await generateUserId();
-
+        const userId = await generateUserId();
         const {
             usernumber,
             phonenumber, email, nickname,
@@ -31,8 +31,8 @@ const saveProfileDetails = async (request, response) => {
             return response.status(404).json({ message: "fields are required" })
         }
         else if (request.body) {
-            await User.save();
-            return response.status(201).json({ message: "details saved successfully" })
+           const responseData= await User.save();
+            return response.status(201).json({ message: "details saved successfully",responseData:responseData})
         }
 
     }
@@ -43,14 +43,18 @@ const saveProfileDetails = async (request, response) => {
 
 const getProfileDetails = async (request, response) => {
 
-    const { email } = request.body;
+    const {email} = request.body;
+
 
     if (!request.body) {
         return response.status(404).json({ message: "fields are required" })
     }
 
     else if (request.body) {
-        const datas = await profileModel.find({ email });
+        // const datas = await profileModel.find({profileid:profileId});
+        const datas = await profileModel.find({email:email});
+
+        console.log(datas)
 
         if (!datas) {
             return response.status(404).json({ message: 'data is not present' })
@@ -58,7 +62,7 @@ const getProfileDetails = async (request, response) => {
         let responsedata;
         for (var data of datas) {
             responsedata = {
-                profileid:data.profileid,
+                profileid: data.profileid,
                 email: data.email,
                 nickname: data.nickname,
                 gender: data.gender,
@@ -77,4 +81,30 @@ const getProfileDetails = async (request, response) => {
 }
 
 
-module.exports = { saveProfileDetails, getProfileDetails }
+let i = 1;
+const sendDeviceDetails = async (request, response) => {
+    const { identifier, isVirtual, manufacturer, model, operatingSystem, osVersion, platform, webViewVersion, value, batteryLevel, isCharging, taken
+    } = request.body;
+    const DeviceDetails = new deviceDetails(
+        {
+            identifier: identifier,
+            isVirtual: isVirtual,
+            manufacturer: manufacturer,
+            model: model,
+            operatingSystem: operatingSystem,
+            osVersion: osVersion,
+            platform: platform,
+            webViewVersion: webViewVersion,
+            value: value,
+            batteryLevel: batteryLevel,
+            isCharging: isCharging,
+            taken: taken,
+            userId: ++i
+
+        }
+    );
+    await DeviceDetails.save();
+    response.status(201).json({ message: "sucessfully... saved" });
+}
+
+module.exports = { saveProfileDetails, getProfileDetails, sendDeviceDetails }

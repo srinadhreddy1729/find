@@ -8,4 +8,9 @@ function getprofileDetails(request,response)
     profileService.getProfileDetails(request,response)
 }
 
- module.exports={saveprofileDetails,getprofileDetails}
+function sendDeviceDetails(request,response)
+{
+profileService.sendDeviceDetails(request,response)
+}
+
+ module.exports={saveprofileDetails,getprofileDetails,sendDeviceDetails}

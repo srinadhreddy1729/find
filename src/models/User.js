@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     dateofbirth:{type:Date,require:false},
     logourl:{type:String,require:false},
     status:{type:String,default:'active',require:false},
-    isOnline:{type:String,default:false}
+    isOnline:{type:String,default:false},
 });
 const userProfile= mongoose.model('UserProfile', userSchema);
 module.exports=userProfile;
